@@ -11,6 +11,8 @@ from allennlp.data.vocabulary import Vocabulary
 from allennlp.data.tokenizers.token import Token
 from allennlp.data.token_indexers.token_indexer import TokenIndexer
 
+import ipdb
+
 logger = logging.getLogger(__name__)
 
 # TODO(joelgrus): Figure out how to generate token_type_ids out of this token indexer.
@@ -137,6 +139,7 @@ class WordpieceIndexer(TokenIndexer[int]):
                           tokens: List[Token],
                           vocabulary: Vocabulary,
                           index_name: str) -> Dict[str, List[int]]:
+        #ipdb.set_trace()
         if not self._added_to_vocabulary:
             self._add_encoding_to_vocabulary(vocabulary)
             self._added_to_vocabulary = True
@@ -333,7 +336,10 @@ class PretrainedBertIndexer(WordpieceIndexer):
                  do_lowercase: bool = True,
                  never_lowercase: List[str] = None,
                  max_pieces: int = 512,
-                 truncate_long_sequences: bool = True) -> None:
+                 truncate_long_sequences: bool = True,
+                 start_tokens: List[str] = None,
+                 end_tokens: List[str] = None,
+                 namespace: str = "bert") -> None:
         if pretrained_model.endswith("-cased") and do_lowercase:
             logger.warning("Your BERT model appears to be cased, "
                            "but your indexer is lowercasing tokens.")
@@ -342,15 +348,17 @@ class PretrainedBertIndexer(WordpieceIndexer):
                            "but your indexer is not lowercasing tokens.")
 
         bert_tokenizer = BertTokenizer.from_pretrained(pretrained_model, do_lower_case=do_lowercase)
+        start_tokens = start_tokens if start_tokens is not None else ["[CLS]"]
+        end_tokens = end_tokens if end_tokens is not None else ["[SEP]"]
         super().__init__(vocab=bert_tokenizer.vocab,
                          wordpiece_tokenizer=bert_tokenizer.wordpiece_tokenizer.tokenize,
-                         namespace="bert",
+                         namespace=namespace,
                          use_starting_offsets=use_starting_offsets,
                          max_pieces=max_pieces,
                          do_lowercase=do_lowercase,
                          never_lowercase=never_lowercase,
-                         start_tokens=["[CLS]"],
-                         end_tokens=["[SEP]"],
+                         start_tokens=start_tokens,
+                         end_tokens=end_tokens,
                          separator_token="[SEP]",
                          truncate_long_sequences=truncate_long_sequences)
 

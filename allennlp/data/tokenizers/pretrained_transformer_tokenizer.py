@@ -9,6 +9,8 @@ from allennlp.data.tokenizers.tokenizer import Tokenizer
 
 logger = logging.getLogger(__name__)
 
+import ipdb
+
 
 @Tokenizer.register("pretrained_transformer")
 class PretrainedTransformerTokenizer(Tokenizer):
@@ -44,7 +46,8 @@ class PretrainedTransformerTokenizer(Tokenizer):
         elif model_name.endswith("-uncased") and not do_lowercase:
             logger.warning("Your pretrained model appears to be uncased, "
                            "but your tokenizer is not lowercasing tokens.")
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=do_lowercase)
+        never_split = ['[unused'+str(i)+']' for i in range(1,100)]
+        self._tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=do_lowercase, never_split=never_split)
         default_start_tokens, default_end_tokens = _guess_start_and_end_token_defaults(model_name)
         self._start_tokens = start_tokens if start_tokens is not None else default_start_tokens
         self._end_tokens = end_tokens if end_tokens is not None else default_end_tokens

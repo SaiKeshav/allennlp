@@ -10,12 +10,14 @@ class PretrainedTransformerEmbedder(TokenEmbedder):
     """
     Uses a pretrained model from ``pytorch-transformers`` as a ``TokenEmbedder``.
     """
-    def __init__(self, model_name: str) -> None:
+    def __init__(self, model_name: str, requires_grad: bool) -> None:
         super().__init__()
         self.transformer_model = AutoModel.from_pretrained(model_name)
         # I'm not sure if this works for all models; open an issue on github if you find a case
         # where it doesn't work.
         self.output_dim = self.transformer_model.config.hidden_size
+        for param in self.transformer_model.parameters():
+            param.requires_grad = requires_grad
 
     @overrides
     def get_output_dim(self):
