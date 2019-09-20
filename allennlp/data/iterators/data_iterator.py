@@ -270,12 +270,14 @@ class DataIterator(Registrable):
                 # we need access to shaping information before batches are constructed)
                 instance.index_fields(self.vocab)
             field_lengths = instance.get_padding_lengths()
-            for _, lengths in field_lengths.items():
-                try:
-                    padding_length = max(padding_length,
-                                         lengths[key])
-                except KeyError:
-                    pass
+            # for _, lengths in field_lengths.items():
+            #     try:
+            #         padding_length = max(padding_length,
+            #                              lengths[key])
+            #     except KeyError:
+            #         pass
+            # padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'])
+            padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_tokens'])
 
             proposed_batch_size = len(batch) + 1
 
