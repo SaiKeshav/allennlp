@@ -277,7 +277,10 @@ class DataIterator(Registrable):
             #     except KeyError:
             #         pass
             # padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'])
-            padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_tokens'])
+            if 'num_tokens' in field_lengths['target_tokens']:
+                padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_tokens'])
+            else:
+                padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'])
 
             proposed_batch_size = len(batch) + 1
 
