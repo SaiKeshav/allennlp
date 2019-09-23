@@ -14,6 +14,8 @@ from allennlp.data.fields import MetadataField
 from allennlp.data.instance import Instance
 from allennlp.data.vocabulary import Vocabulary
 
+import ipdb
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 TensorDict = Dict[str, Union[torch.Tensor, Dict[str, torch.Tensor]]]  # pylint: disable=invalid-name
@@ -280,7 +282,7 @@ class DataIterator(Registrable):
             if 'num_tokens' in field_lengths['target_tokens']:
                 padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_tokens'])
             else:
-                padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'])
+                padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_fields']*field_lengths['target_tokens']['list_tokens_length'])
 
             proposed_batch_size = len(batch) + 1
 
