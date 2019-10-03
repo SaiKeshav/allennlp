@@ -64,6 +64,8 @@ from allennlp.models.archival import load_archive
 from allennlp.training.util import evaluate
 from allennlp.common import Params
 
+import ipdb
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -166,6 +168,12 @@ def evaluate_from_args(args: argparse.Namespace) -> Dict[str, Any]:
         logger.info("%s: %s", key, metric)
 
     output_file = args.output_file
+    ## ksk
+    #if 'probs' in metrics:
+    #    with open(output_file, 'w') as file:
+    #        zipped_metrics = list(zip(metrics['example_ids'], metrics['probs']))
+    #        str_metrics = [str(s[0])+'\t'+str(s[1]) for s in zipped_metrics]
+    #        file.write('\n'.join(str_metrics))
     if output_file:
         with open(output_file, "w") as file:
             json.dump(metrics, file, indent=4)

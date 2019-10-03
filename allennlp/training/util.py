@@ -24,6 +24,8 @@ from allennlp.models.model import Model
 from allennlp.models.archival import CONFIG_NAME
 from allennlp.nn import util as nn_util
 
+import ipdb
+
 logger = logging.getLogger(__name__)
 
 # We want to warn people that tqdm ignores metrics that start with underscores
@@ -388,6 +390,8 @@ def evaluate(model: Model,
         total_loss = 0.0
         # Cumulative weight across all batches.
         total_weight = 0.0
+        # ksk 
+        total_probs, all_example_ids = [], []
 
         for batch in generator_tqdm:
             batch_count += 1
@@ -408,6 +412,10 @@ def evaluate(model: Model,
                 total_loss += loss.item() * weight
                 # Report the average loss so far.
                 metrics["loss"] = total_loss / total_weight
+                # ksk
+                if  'probs' in output_dict:
+                    total_probs.extend(output_dict['probs'])
+                    all_example_ids.extend([batch['metadata'][batch_index]['example_ids'] for batch_index in range(len(batch['metadata']))])
 
             if (not HasBeenWarned.tqdm_ignores_underscores and
                         any(metric_name.startswith("_") for metric_name in metrics)):
@@ -425,6 +433,13 @@ def evaluate(model: Model,
                 raise RuntimeError("The model you are trying to evaluate only sometimes " +
                                    "produced a loss!")
             final_metrics["loss"] = total_loss / total_weight
+            # ksk
+            if 'probs' in output_dict:
+                total_probs.extend(output_dict['probs'])
+                all_example_ids.extend([batch['metadata'][batch_index]['example_ids'] for batch_index in range(len(batch['metadata']))])
+                final_metrics["probs"] = total_probs
+                final_metrics["example_ids"] = all_example_ids
+
 
         return final_metrics
 
