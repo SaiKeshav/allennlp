@@ -131,13 +131,14 @@ class TrackMetrics(Callback):
         for key, value in trainer.val_metrics.items():
             trainer.metrics["validation_" + key] = value
 
+        #ksk
+        trainer.metrics['best_epoch'] = trainer.epoch_number
+        for key, value in trainer.val_metrics.items():
+            trainer.metrics["best_validation_" + key] = value
+        self.metric_tracker.current_epoch_metrics = copy.deepcopy(trainer.val_metrics)
         if self.metric_tracker.is_best_so_far():
             # Update all the best_ metrics.
             # (Otherwise they just stay the same as they were.)
-            trainer.metrics['best_epoch'] = trainer.epoch_number
-            for key, value in trainer.val_metrics.items():
-                trainer.metrics["best_validation_" + key] = value
-
             self.metric_tracker.best_epoch_metrics = copy.deepcopy(trainer.val_metrics)
 
         # pylint: disable=protected-access

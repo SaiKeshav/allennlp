@@ -516,13 +516,14 @@ class Trainer(TrainerBase):
             for key, value in val_metrics.items():
                 metrics["validation_" + key] = value
 
+            #ksk
+            metrics['best_epoch'] = epoch
+            for key, value in val_metrics.items():
+                metrics["best_validation_" + key] = value
+            self._metric_tracker.current_epoch_metrics = val_metrics
             if self._metric_tracker.is_best_so_far():
                 # Update all the best_ metrics.
                 # (Otherwise they just stay the same as they were.)
-                metrics['best_epoch'] = epoch
-                for key, value in val_metrics.items():
-                    metrics["best_validation_" + key] = value
-
                 self._metric_tracker.best_epoch_metrics = val_metrics
 
             if self._serialization_dir:

@@ -2,6 +2,8 @@ from typing import Optional, Iterable, Dict, Any
 
 from allennlp.common.checks import ConfigurationError
 
+import ipdb
+
 class MetricTracker:
     """
     This class tracks a metric during training for the dual purposes of early stopping
@@ -36,6 +38,7 @@ class MetricTracker:
         self._epochs_with_no_improvement = 0
         self._is_best_so_far = True
         self.best_epoch_metrics: Dict[str, float] = {}
+        self.current_epoch_metrics: Dict[str, float] = {}
         self._epoch_number = 0
         self.best_epoch: int = None
 
@@ -77,6 +80,7 @@ class MetricTracker:
                 "is_best_so_far": self._is_best_so_far,
                 "should_decrease": self._should_decrease,
                 "best_epoch_metrics": self.best_epoch_metrics,
+                "current_epoch_metrics": self.current_epoch_metrics,
                 "epoch_number": self._epoch_number,
                 "best_epoch": self.best_epoch
         }
@@ -91,6 +95,7 @@ class MetricTracker:
         self._is_best_so_far = state_dict["is_best_so_far"]
         self._should_decrease = state_dict["should_decrease"]
         self.best_epoch_metrics = state_dict["best_epoch_metrics"]
+        self.current_epoch_metrics = state_dict["current_epoch_metrics"]
         self._epoch_number = state_dict["epoch_number"]
         self.best_epoch = state_dict["best_epoch"]
 

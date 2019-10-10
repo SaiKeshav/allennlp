@@ -279,6 +279,7 @@ class DataIterator(Registrable):
             #     except KeyError:
             #         pass
             # padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'])
+            #ksk
             if 'num_tokens' in field_lengths['target_tokens']:
                 padding_length = max(padding_length, field_lengths['source_tokens']['num_tokens'] + field_lengths['target_tokens']['num_tokens'])
             else:
