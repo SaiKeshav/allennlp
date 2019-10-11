@@ -83,48 +83,48 @@ class Checkpointer(Registrable):
                                          "training_state_epoch_{}.th".format(epoch))
             torch.save({**training_states, "epoch": epoch}, training_path)
             metric = training_states['metric_tracker']['current_epoch_metrics']
-            metric = [metric['BLEU'], metric['loss']]
+            metric = [metric['carb_f1'], metric['carb_auc']]
 
-        if self._num_serialized_models_to_keep is not None and self._num_serialized_models_to_keep >= 0:
-            self._auc_paths.append((metric[0], model_path, training_path))
-            self._f1_paths.append((metric[1], model_path, training_path))
+            if self._num_serialized_models_to_keep is not None and self._num_serialized_models_to_keep >= 0:
+                self._auc_paths.append((metric[0], model_path, training_path))
+                self._f1_paths.append((metric[1], model_path, training_path))
 
-            self._auc_paths = sorted(self._auc_paths, key=lambda x: x[0], reverse=True)
-            self._f1_paths = sorted(self._f1_paths, key=lambda x: x[0], reverse=True)
+                self._auc_paths = sorted(self._auc_paths, key=lambda x: x[0], reverse=True)
+                self._f1_paths = sorted(self._f1_paths, key=lambda x: x[0], reverse=True)
 
-            auc_model_path_to_remove, f1_model_path_to_remove = '', ''
-            if len(self._auc_paths) > self._num_serialized_models_to_keep:
-                auc_model_path_to_remove = self._auc_paths.pop(-1)[1]
-            if len(self._f1_paths) > self._num_serialized_models_to_keep:
-                f1_model_path_to_remove = self._f1_paths.pop(-1)[1]
+                auc_model_path_to_remove, f1_model_path_to_remove = '', ''
+                if len(self._auc_paths) > self._num_serialized_models_to_keep:
+                    auc_model_path_to_remove = self._auc_paths.pop(-1)[1]
+                if len(self._f1_paths) > self._num_serialized_models_to_keep:
+                    f1_model_path_to_remove = self._f1_paths.pop(-1)[1]
 
-            if auc_model_path_to_remove != model_path or f1_model_path_to_remove != model_path:
+                if auc_model_path_to_remove != model_path or f1_model_path_to_remove != model_path:
+                    torch.save(model_state, model_path)
+
+                model_paths_to_remove = []
+                if auc_model_path_to_remove != '':
+                    # Remove auc_path only if it is not present in f1_paths
+                    keep_path = False
+                    for f1_path in self._f1_paths:
+                        if f1_path[1] == auc_model_path_to_remove:
+                            keep_path = True
+                    if not keep_path:
+                        model_paths_to_remove.append(auc_model_path_to_remove)
+
+                if f1_model_path_to_remove:
+                    keep_path = False
+                    for auc_path in self._auc_paths:
+                        if auc_path[1] == f1_model_path_to_remove:
+                            keep_path = True
+                    if not keep_path:
+                        model_paths_to_remove.append(f1_model_path_to_remove)
+
+                import ipdb; ipdb.set_trace()
+                for fname in model_paths_to_remove:
+                    if os.path.isfile(fname):
+                        os.remove(fname)
+            else:
                 torch.save(model_state, model_path)
-
-            model_paths_to_remove = []
-            if auc_model_path_to_remove != '':
-                # Remove auc_path only if it is not present in f1_paths
-                keep_path = False
-                for f1_path in self._f1_paths:
-                    if f1_path[1] == auc_model_path_to_remove:
-                        keep_path = True
-                if not keep_path:
-                    model_paths_to_remove.append(auc_model_path_to_remove)
-
-            if f1_model_path_to_remove:
-                keep_path = False
-                for auc_path in self._auc_paths:
-                    if auc_path[1] == f1_model_path_to_remove:
-                        keep_path = True
-                if not keep_path:
-                    model_paths_to_remove.append(f1_model_path_to_remove)
-
-            import ipdb; ipdb.set_trace()
-            for fname in model_paths_to_remove:
-                if os.path.isfile(fname):
-                    os.remove(fname)
-        else:
-            torch.save(model_state, model_path)
 
         return
 
