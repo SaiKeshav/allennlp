@@ -119,7 +119,6 @@ class Checkpointer(Registrable):
                     if not keep_path:
                         model_paths_to_remove.append(f1_model_path_to_remove)
 
-                import ipdb; ipdb.set_trace()
                 for fname in model_paths_to_remove:
                     if os.path.isfile(fname):
                         os.remove(fname)
