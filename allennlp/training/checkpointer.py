@@ -72,7 +72,7 @@ class Checkpointer(Registrable):
                             if os.path.isfile(fname):
                                 os.remove(fname)
 
-    def _save_checkpoint(self,
+    def carb_save_checkpoint(self,
                         epoch: Union[int, str],
                         model_state: Dict[str, Any],
                         training_states: Dict[str, Any],
