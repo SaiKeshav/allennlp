@@ -35,7 +35,7 @@ class Checkpointer(Registrable):
         self._serialized_paths: List[Tuple[float, str, str]] = []
         self._auc_paths, self._f1_paths = [], []
 
-    def save_checkpoint(self,
+    def _save_checkpoint(self,
                         epoch: Union[int, str],
                         model_state: Dict[str, Any],
                         training_states: Dict[str, Any],
@@ -72,7 +72,7 @@ class Checkpointer(Registrable):
                             if os.path.isfile(fname):
                                 os.remove(fname)
 
-    def _save_checkpoint(self,
+    def save_checkpoint(self,
                         epoch: Union[int, str],
                         model_state: Dict[str, Any],
                         training_states: Dict[str, Any],
@@ -83,7 +83,8 @@ class Checkpointer(Registrable):
                                          "training_state_epoch_{}.th".format(epoch))
             torch.save({**training_states, "epoch": epoch}, training_path)
             metric = training_states['metric_tracker']['current_epoch_metrics']
-            metric = [metric['carb_f1'], metric['carb_auc']]
+            if 'carb_f1' in metric:
+                metric = [metric['carb_f1'], metric['carb_auc']]
 
             if self._num_serialized_models_to_keep is not None and self._num_serialized_models_to_keep >= 0:
                 self._auc_paths.append((metric[0], model_path, training_path))
