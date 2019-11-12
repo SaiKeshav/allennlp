@@ -222,7 +222,10 @@ class Predictor(Registrable):
         """
         instances = []
         for json_dict in json_dicts:
-            instances.append(self._json_to_instance(json_dict))
+            # ksk CHANGED
+            instance = self._json_to_instance(json_dict)
+            if instance != None:
+                instances.append(instance)
         return instances
 
     @classmethod

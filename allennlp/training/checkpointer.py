@@ -204,11 +204,14 @@ class Checkpointer(Registrable):
         return model_state, training_state
 
     def best_model_state(self) -> Dict[str, Any]:
-        if self._serialization_dir:
-            logger.info("loading best weights")
-            best_model_state_path = os.path.join(self._serialization_dir, 'best.th')
-            return torch.load(best_model_state_path)
-        else:
-            logger.info("cannot load best weights without `serialization_dir`, "
-                        "so you're just getting the last weights")
-            return {}
+        return {}
+
+        # ksk CHANGED
+        # if self._serialization_dir:
+        #     logger.info("loading best weights")
+        #     best_model_state_path = os.path.join(self._serialization_dir, 'best.th')
+        #     return torch.load(best_model_state_path)
+        # else:
+        #     logger.info("cannot load best weights without `serialization_dir`, "
+        #                 "so you're just getting the last weights")
+        #     return {}
