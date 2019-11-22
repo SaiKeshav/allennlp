@@ -5,7 +5,6 @@ import torch
 
 from allennlp.common.checks import ConfigurationError
 
-
 StateType = Dict[str, torch.Tensor]  # pylint: disable=invalid-name
 StepFunctionType = Callable[[torch.Tensor, StateType], Tuple[torch.Tensor, StateType]]  # pylint: disable=invalid-name
 
@@ -152,6 +151,7 @@ class BeamSearch:
                     reshape(batch_size * self.beam_size, *last_dims)
 
         for timestep in range(self.max_steps - 1):
+
             # shape: (batch_size * beam_size,)
             last_predictions = predictions[-1].reshape(batch_size * self.beam_size)
 
@@ -163,6 +163,7 @@ class BeamSearch:
             # Take a step. This get the predicted log probs of the next classes
             # and updates the state.
             # shape: (batch_size * beam_size, num_classes)
+            last_predictions_cpu = last_predictions.cpu()
             class_log_probabilities, state = step(last_predictions, state)
 
             # shape: (batch_size * beam_size, num_classes)
@@ -272,5 +273,6 @@ class BeamSearch:
 
         # shape: (batch_size, beam_size, max_steps)
         all_predictions = torch.cat(list(reversed(reconstructed_predictions)), 2)
+        all_predictions_cpu = all_predictions.cpu()
 
         return all_predictions, last_log_probabilities
